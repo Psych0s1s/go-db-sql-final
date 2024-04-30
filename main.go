@@ -97,9 +97,14 @@ func (s ParcelService) Delete(number int) error {
 }
 
 func main() {
-	// настройте подключение к БД
+	db, err := sql.Open("sqlite", "tracker.db")
+	if err != nil {
+		fmt.Println("Ошибка подключения к базе данных:", err)
+		return
+	}
+	defer db.Close()
 
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	store := NewParcelStore(db)
 	service := NewParcelService(store)
 
 	// регистрация посылки
@@ -120,6 +125,14 @@ func main() {
 	}
 
 	// изменение статуса
+	err = service.NextStatus(p.Number)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// моя отсебятина :)
+	// eщё одно изменение статуса, иначе зачем нам вообще константа ParcelStatusDelivered, которая имеет значение «delivered»
 	err = service.NextStatus(p.Number)
 	if err != nil {
 		fmt.Println(err)
